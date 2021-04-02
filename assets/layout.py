@@ -416,8 +416,8 @@ def layout():
             html.Div(
                 id="center",
                 children=[
-                    html.Img(src="assets/ssnapp_logo.png",
-                             height = 200)
+                    html.Img(src="assets/ssnaap_logo.png",
+                             height = 400)
                 ]
             ),
             html.Div(
