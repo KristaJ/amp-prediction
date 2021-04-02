@@ -418,7 +418,7 @@ def layout():
                 children=[
                     html.Img(src="assets/ssnaap_logo.png",
                              height = 400)
-                ]
+                ],
             ),
             html.Div(
                 id = "input-tabs",
