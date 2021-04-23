@@ -174,7 +174,7 @@ def algo_input_card():
     Alpha_selection = dbc.RadioItems(
         id = "alphabet",
         options=[
-            {'label': "<b>Minimized Mismatch</b> \U00002754", 'value': 'A', 'label_id': "min_mismatch"},
+            {'label': "Minimized Mismatch \U00002754", 'value': 'A', 'label_id': "min_mismatch"},
             {'label': 'Monte Carlo Reduction \U00002754', 'value': 'B', 'label_id': "MC_reduction"},
             {'label': 'Chemical Property Similarity \U00002754', 'value': 'C', 'label_id': "chem"},
             {'label': 'Molecular Recognition Theory \U00002754', 'value': 'D', 'label_id': "MRT"},

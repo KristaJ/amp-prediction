@@ -203,48 +203,50 @@ def getPeptideParameters(PDB_n_clicks, local_n_clicks, fasta_n_clicks,
         start = 0
         end = len(fasta)
         final_filename = None
-        chain = "A"    
+        chain = "A"  
+        print(f"processed: {fasta}, {structure}, start{start}, end{end}") 
     # Error checking
-        if start > end:
-            error_text = f"The start index can't be larger than the end index"
-            structure = ""
-            start = None
-            end = None
-            final_filename = None
-            chain = None
-            aa_content = ""
-            return(error_text, structure, start, end, final_filename, chain, {"display":"none"}, default_fig)        
-        if error:
-            structure = ""
-            start = None
-            end = None
-            final_filename = None
-            chain = None
-            aa_content = ""
-            return(fasta, structure[start:end], start, end, final_filename, chain, {"display":"none"}, default_fig)
-        if fasta[start:end].find('X') > -1:
-            error_text = f"This Sequence contains non-standard amino acids.\n\
-            Please trim the sequence using the start and end parameters\n{fasta[start:end]}"
-            structure = ""
-            start = None
-            end = None
-            final_filename = None
-            chain = None
-            aa_content = ""
-            return(error_text, structure, start, end, final_filename, chain, {"display":"none"}, default_fig)
-        elif len(fasta[start:end]) != len(structure[start:end]):
-            error_text = 'Sequence and structure lengths are not the same\n\
-                Please double check your inputs'
-            structure = ""
-            start = None
-            end = None
-            final_filename = None
-            chain = None
-            aa_content = ""
-            return(error_text, structure, start, end, final_filename, chain, {"display":"none"}, default_fig)
+    if start > end:
+        error_text = f"The start index can't be larger than the end index"
+        structure = ""
+        start = None
+        end = None
+        final_filename = None
+        chain = None
+        aa_content = ""
+        return(error_text, structure, start, end, final_filename, chain, {"display":"none"}, default_fig)        
+    # if error:
+    #     structure = ""
+    #     start = None
+    #     end = None
+    #     final_filename = None
+    #     chain = None
+    #     aa_content = ""
+    #     return(fasta, structure[start:end], start, end, final_filename, chain, {"display":"none"}, default_fig)
+    if fasta[start:end].find('X') > -1:
+        error_text = f"This Sequence contains non-standard amino acids.\n\
+        Please trim the sequence using the start and end parameters\n{fasta[start:end]}"
+        structure = ""
+        start = None
+        end = None
+        final_filename = None
+        chain = None
+        aa_content = ""
+        return(error_text, structure, start, end, final_filename, chain, {"display":"none"}, default_fig)
+    if len(fasta[start:end]) != len(structure[start:end]):
+        error_text = 'Sequence and structure lengths are not the same\n\
+            Please double check your inputs'
+        structure = ""
+        start = None
+        end = None
+        final_filename = None
+        chain = None
+        aa_content = ""
+        return(error_text, structure, start, end, final_filename, chain, {"display":"none"}, default_fig)
     else:
         aa_content = aa.calc_AA_st(fasta)
         aa_fig = aa.plot_aa_content(aa_content)
+        print(fasta[start:end], structure[start:end], start, end, final_filename, chain, {"display":"block"}, aa_fig)
         return(fasta[start:end], structure[start:end], start, end, final_filename, chain, {"display":"block"}, aa_fig)
   
 #toggle collapse buttons
@@ -399,7 +401,6 @@ def toggle_inputs(feature_groups, structure, filename):
 )       
 def getModelParams(n_click, Fasta, Structure, filename, chain, start, end, window_toggle, window_size, alpha = None, algo=None, 
 feature_list=None, num_features=None):
-
     if (algo== ""):
         return("no algorithm selected",  {"display":"none"}, default_fig,"")
     if (alpha == ""):
@@ -411,9 +412,9 @@ feature_list=None, num_features=None):
     feature_names = "".join(feature_list)
     model = getModel(algo, alpha, num_features, feature_names)
     features = classify.get_features(alpha, feature_list, num_features)
+
     if not window_toggle:
-        processed_data = pi.process_input(chain, start, end, alpha, filename)
-        
+        processed_data = pi.process_input(chain, start, end, alpha, filename, Fasta, Structure)
         pred, pred_prob = classify.classify_input(processed_data, features, model)
         explain_graph = classify.explain_prediction(features, model)
         output_string = format_model_output(algo, alpha, num_features, feature_list)
@@ -430,7 +431,7 @@ feature_list=None, num_features=None):
         window_end = window_start + window_size
         window_preds = {}
         while window_end <= end:
-            processed_data = pi.process_input(chain, window_start, window_end, alpha, filename)
+            processed_data = pi.process_input(chain, window_start, window_end, alpha, filename, Fasta, Structure)
             pred, pred_prob = classify.classify_input(processed_data, features, model)
             window_preds[window_start] = pred_prob[0][1]
             window_start += 1
