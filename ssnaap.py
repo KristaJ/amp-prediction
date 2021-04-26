@@ -204,7 +204,6 @@ def getPeptideParameters(PDB_n_clicks, local_n_clicks, fasta_n_clicks,
         end = len(fasta)
         final_filename = None
         chain = "A"  
-        print(f"processed: {fasta}, {structure}, start{start}, end{end}") 
     # Error checking
     if start > end:
         error_text = f"The start index can't be larger than the end index"
@@ -246,7 +245,6 @@ def getPeptideParameters(PDB_n_clicks, local_n_clicks, fasta_n_clicks,
     else:
         aa_content = aa.calc_AA_st(fasta)
         aa_fig = aa.plot_aa_content(aa_content)
-        print(fasta[start:end], structure[start:end], start, end, final_filename, chain, {"display":"block"}, aa_fig)
         return(fasta[start:end], structure[start:end], start, end, final_filename, chain, {"display":"block"}, aa_fig)
   
 #toggle collapse buttons
@@ -412,7 +410,6 @@ feature_list=None, num_features=None):
     feature_names = "".join(feature_list)
     model = getModel(algo, alpha, num_features, feature_names)
     features = classify.get_features(alpha, feature_list, num_features)
-
     if not window_toggle:
         processed_data = pi.process_input(chain, start, end, alpha, filename, Fasta, Structure)
         pred, pred_prob = classify.classify_input(processed_data, features, model)
@@ -433,13 +430,12 @@ feature_list=None, num_features=None):
         while window_end <= end:
             processed_data = pi.process_input(chain, window_start, window_end, alpha, filename, Fasta, Structure)
             pred, pred_prob = classify.classify_input(processed_data, features, model)
-            window_preds[window_start] = pred_prob[0][1]
+            window_preds[window_start] = round(pred_prob[0][1], 6)
             window_start += 1
             window_end = window_start + window_size
-
         fit_line = {}
         lowest_res = 100
-        for i in range(1,5):
+        for i in range(0,5):
             fit_line = np.polyfit(list(window_preds.keys()), list(window_preds.values()), i, full=True)
             if fit_line[1] < lowest_res:
                 lowest_res = fit_line[1]
