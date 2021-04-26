@@ -454,8 +454,8 @@ feature_list=None, num_features=None):
                           xaxis=dict(title= "Start Residue"),
                           title_font_size=30,
                           showlegend=False,
-                          height = 300,
-                          width = 500
+                          height = 500,
+                          width = 700
                           )  
         return (f"Prediction using a window size of { window_size}", {"display":"block"}, fig, "")
 
