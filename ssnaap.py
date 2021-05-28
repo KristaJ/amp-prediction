@@ -20,6 +20,7 @@ from dash_extensions import Download
 from dash_extensions.snippets import send_data_frame
 from scipy.optimize import least_squares
 import fontawesome as fa
+import json
 
 
 UPLOAD_DIRECTORY = "./PDB_FILES"
@@ -207,11 +208,9 @@ def getPeptideParameters(PDB_n_clicks, local_n_clicks, fasta_n_clicks,
         end = len(fasta)
         final_filename = None
         chain = "A" 
-        print("FASTA SUBMITTED") 
     # Error checking
     if start > end:
         error_text = f"The start index can't be larger than the end index"
-        print(error_tet)
         structure = ""
         start = None
         end = None
@@ -230,7 +229,6 @@ def getPeptideParameters(PDB_n_clicks, local_n_clicks, fasta_n_clicks,
     if fasta[start:end].find('X') > -1:
         error_text = f"This Sequence contains non-standard amino acids.\n\
         Please trim the sequence using the start and end parameters\n{fasta[start:end]}"
-        print(error_tet)
         structure = ""
         start = None
         end = None
@@ -241,7 +239,6 @@ def getPeptideParameters(PDB_n_clicks, local_n_clicks, fasta_n_clicks,
     if structure and len(fasta[start:end]) != len(structure[start:end]):
         error_text = 'Sequence and structure lengths are not the same\n\
             Please double check your inputs'
-        print(error_tet)
         structure = ""
         start = None
         end = None
@@ -249,11 +246,8 @@ def getPeptideParameters(PDB_n_clicks, local_n_clicks, fasta_n_clicks,
         chain = None
         aa_content = ""
         return(error_text, structure, start, end, final_filename, chain, {"display":"none"}, default_fig)
-    print("PROCESSING DATA")
     fasta_string = fasta[start:end]
-    print(fasta_string)
     aa_content = aa.calc_AA_st(fasta_string)
-    print(aa_content)
     aa_fig = aa.plot_aa_content(aa_content)
     
     if structure:
@@ -445,7 +439,6 @@ feature_list=None, num_features=None):
         window_end = window_start + window_size
         if window_end > len(Fasta):
             return('Window larger than Peptide', {"display":"none"}, default_fig, "")
-            print(Fasta)
         window_preds = {}
         processed_data_all = pd.DataFrame()
         while window_end <= end:
@@ -455,8 +448,7 @@ feature_list=None, num_features=None):
             processed_data['start_residue'] = window_start
             window_start += 1
             window_end = window_start + window_size
-            processed_data_all.append(processed_data)
-            print(processed_data_all)
+            processed_data_all = processed_data_all.append(processed_data, ignore_index = True)
         fit_line = {}
         lowest_res = 100
         for i in range(0,5):
@@ -478,14 +470,15 @@ feature_list=None, num_features=None):
                           height = 700,
                           width = 700
                           )  
-        processed_data = processed_data_all
-        return (f"Prediction using a window size of { window_size}", {"display":"block"}, fig, "")
+        json_data = processed_data_all.to_json(orient='index')
+        return (f"Prediction using a window size of { window_size}", {"display":"block"}, fig, json_data)
 
 @app.callback(Output("download", "data"),
              [Input("btn", "n_clicks")],
             [State("saved_data", "data")]
 )
 def generate_csv(n_nlicks, processed_data):
+
     df = pd.read_json(processed_data, orient='index')
     return send_data_frame(df.to_csv, filename="output.csv")
 
