@@ -209,8 +209,8 @@ def explain_prediction(features, model):
         yaxis = dict(
             title = "Feature",
             dtick =  1),
-        height = 300,
-        width = 500
+        height = 700,
+        width = 700
     )
     return explain_fig
     

@@ -20,6 +20,8 @@ def process_input(chain, start, end, alpha, filename, fasta, structure):
         seq_n_grams = gn.Generate_seq_ngrams(red_seq, alpha)
     if structure:
         struct_n_grams = gn.Generate_struct_ngrams(structure)
+    else:
+        struct_n_grams = pd.DataFrame()
     if filename:
         tess = wt.tesselate_st(filename, fasta, chain, alpha, start, end)
     else:

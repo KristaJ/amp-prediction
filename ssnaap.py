@@ -199,14 +199,19 @@ def getPeptideParameters(PDB_n_clicks, local_n_clicks, fasta_n_clicks,
         if fasta_sequence == None:
             return ('missing Sequence', "", "", "", "", "", {"display":"none"}, default_fig)
         fasta = fasta_sequence.upper()
-        structure = direct_structure.upper()
+        if direct_structure:
+            structure = direct_structure.upper()
+        else:
+            structure = None
         start = 0
         end = len(fasta)
         final_filename = None
-        chain = "A"  
+        chain = "A" 
+        print("FASTA SUBMITTED") 
     # Error checking
     if start > end:
         error_text = f"The start index can't be larger than the end index"
+        print(error_tet)
         structure = ""
         start = None
         end = None
@@ -225,6 +230,7 @@ def getPeptideParameters(PDB_n_clicks, local_n_clicks, fasta_n_clicks,
     if fasta[start:end].find('X') > -1:
         error_text = f"This Sequence contains non-standard amino acids.\n\
         Please trim the sequence using the start and end parameters\n{fasta[start:end]}"
+        print(error_tet)
         structure = ""
         start = None
         end = None
@@ -232,9 +238,10 @@ def getPeptideParameters(PDB_n_clicks, local_n_clicks, fasta_n_clicks,
         chain = None
         aa_content = ""
         return(error_text, structure, start, end, final_filename, chain, {"display":"none"}, default_fig)
-    if len(fasta[start:end]) != len(structure[start:end]):
+    if structure and len(fasta[start:end]) != len(structure[start:end]):
         error_text = 'Sequence and structure lengths are not the same\n\
             Please double check your inputs'
+        print(error_tet)
         structure = ""
         start = None
         end = None
@@ -242,10 +249,19 @@ def getPeptideParameters(PDB_n_clicks, local_n_clicks, fasta_n_clicks,
         chain = None
         aa_content = ""
         return(error_text, structure, start, end, final_filename, chain, {"display":"none"}, default_fig)
+    print("PROCESSING DATA")
+    fasta_string = fasta[start:end]
+    print(fasta_string)
+    aa_content = aa.calc_AA_st(fasta_string)
+    print(aa_content)
+    aa_fig = aa.plot_aa_content(aa_content)
+    
+    if structure:
+        structure_string = structure[start:end]
     else:
-        aa_content = aa.calc_AA_st(fasta)
-        aa_fig = aa.plot_aa_content(aa_content)
-        return(fasta[start:end], structure[start:end], start, end, final_filename, chain, {"display":"block"}, aa_fig)
+        structure_string = None
+    return(fasta_string, structure_string, start, end, final_filename, chain, {"display":"block"}, aa_fig)
+        # return(fasta[start:end], structure[start:end], start, end, final_filename, chain, {"display":"block"}, aa_fig)
   
 #toggle collapse buttons
 @app.callback(
@@ -322,7 +338,7 @@ def toggle_window_slider(window_toggle, is_open):
     Input('final_filename', 'children')]
 )
 def toggle_inputs(n_click1, n_click2, n_click3, structure, filename):
-    if (structure == ""):
+    if (structure == None):
         return([
             {'label': 'Amino Acid Content', 'value': 'aa'},
             {'label': 'Sequence n-grams', 'value': 'seq'},
@@ -425,14 +441,22 @@ feature_list=None, num_features=None):
         return output_string, {"display":"block"}, explain_graph, json_data
     if window_toggle:
         window_start = start
+
         window_end = window_start + window_size
+        if window_end > len(Fasta):
+            return('Window larger than Peptide', {"display":"none"}, default_fig, "")
+            print(Fasta)
         window_preds = {}
+        processed_data_all = pd.DataFrame()
         while window_end <= end:
             processed_data = pi.process_input(chain, window_start, window_end, alpha, filename, Fasta, Structure)
             pred, pred_prob = classify.classify_input(processed_data, features, model)
             window_preds[window_start] = round(pred_prob[0][1], 6)
+            processed_data['start_residue'] = window_start
             window_start += 1
             window_end = window_start + window_size
+            processed_data_all.append(processed_data)
+            print(processed_data_all)
         fit_line = {}
         lowest_res = 100
         for i in range(0,5):
@@ -446,13 +470,15 @@ feature_list=None, num_features=None):
                     mode='lines',
                     name='lines'))
         fig.update_layout(title_text="AMP prediction Probabilities",
-                          yaxis=dict(title = "AMP Probability"),
+                          yaxis=dict(title = "AMP Probability",
+                          range = [0, 1.0]),
                           xaxis=dict(title= "Start Residue"),
                           title_font_size=30,
                           showlegend=False,
-                          height = 500,
+                          height = 700,
                           width = 700
                           )  
+        processed_data = processed_data_all
         return (f"Prediction using a window size of { window_size}", {"display":"block"}, fig, "")
 
 @app.callback(Output("download", "data"),

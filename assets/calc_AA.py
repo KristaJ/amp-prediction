@@ -40,7 +40,7 @@ def plot_aa_content(aa_pcts):
 
         ))
     fig.update_layout(
-        height = 300,
-        width = 500
+        height = 500,
+        width = 700
     )
     return fig
