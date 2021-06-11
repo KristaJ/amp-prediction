@@ -27,4 +27,4 @@ ps -ef|grep python
 # get rid of the previous output file
 rm nohup.out
 
-nohup gunicorn ngampp:server -b :8080 &
+nohup gunicorn -w 4 ssnaap:server -b :8080 &

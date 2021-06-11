@@ -457,11 +457,11 @@ feature_list=None, num_features=None):
                 lowest_res = fit_line[1]
                 lowest_poly = np.poly1d(fit_line[0])
         
-        fig = go.Figure(data=go.Scatter(x=list(window_preds.keys()), y=list(window_preds.values()), mode='markers'))
-        fig.add_trace(go.Scatter(x=list(window_preds.keys()), y=lowest_poly(list(window_preds.keys())),
+        fig_window = go.Figure(data=go.Scatter(x=list(window_preds.keys()), y=list(window_preds.values()), mode='markers'))
+        fig_window.add_trace(go.Scatter(x=list(window_preds.keys()), y=lowest_poly(list(window_preds.keys())),
                     mode='lines',
                     name='lines'))
-        fig.update_layout(title_text="AMP prediction Probabilities",
+        fig_window.update_layout(title_text="AMP prediction Probabilities",
                           yaxis=dict(title = "AMP Probability",
                           range = [0, 1.0]),
                           xaxis=dict(title= "Start Residue"),
@@ -470,8 +470,8 @@ feature_list=None, num_features=None):
                           height = 700,
                           width = 700
                           )  
-        json_data = processed_data_all.to_json(orient='index')
-        return (f"Prediction using a window size of { window_size}", {"display":"block"}, fig, json_data)
+        json_data_window = processed_data_all.to_json(orient='index')
+        return (f"Prediction using a window size of { window_size}", {"display":"block"}, fig_window, json_data_window)
 
 @app.callback(Output("download", "data"),
              [Input("btn", "n_clicks")],
