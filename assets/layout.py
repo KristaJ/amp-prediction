@@ -431,7 +431,9 @@ def layout():
                                 dcc.Markdown(introtext1),
                                 html.Img(src="assets/equation.png",
                                         width="80%"),
-                                dcc.Markdown(introtext2)
+                                dcc.Markdown(introtext2),
+                                html.A(href="assets/supplemental.html",
+                                children="Supplemental Informationßß"),
                             ]
                         ),
                         dbc.Tab(

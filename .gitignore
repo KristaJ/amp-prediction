@@ -131,3 +131,4 @@ dmypy.json
 
 #Unnecessary files
 /PDB_Files
+create_html.py
