@@ -433,7 +433,7 @@ def layout():
                                         width="80%"),
                                 dcc.Markdown(introtext2),
                                 html.A(href="assets/supplemental.html",
-                                children="Supplemental Informationßß"),
+                                children="Supplemental Information"),
                             ]
                         ),
                         dbc.Tab(
