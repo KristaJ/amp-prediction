@@ -29,7 +29,12 @@ default_css = "https://codepen.io/chriddyp/pen/bWLwgP.css"
 
 external_stylesheets = [dbc.themes.SPACELAB, FONT_AWESOME, default_css]
 server = flask.Flask(__name__)
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets, server=server, prevent_initial_callbacks=True, suppress_callback_exceptions=True)
+app = dash.Dash(__name__, 
+    external_stylesheets=external_stylesheets, 
+    url_base_pathname='/ssnaap/', 
+    server=server, 
+    prevent_initial_callbacks=True, 
+    suppress_callback_exceptions=True)
 
 default_fig = go.Figure(
     data=[
